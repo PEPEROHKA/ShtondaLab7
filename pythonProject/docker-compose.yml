@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Пароль для root користувача
+      MYSQL_DATABASE: rental_db          # Назва бази даних
+      MYSQL_USER: user                   # Користувач для бази даних
+      MYSQL_PASSWORD: userpassword       # Пароль для користувача
+    ports:
+      - "3306:3306"                       # Прокидання порту для доступу до MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql         # Збереження даних на хості
+    networks:
+      - mysql_network
+    restart: always
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql                    # Ім'я сервісу MySQL, до якого підключається phpMyAdmin
+      PMA_PORT: 3306                      # Порт MySQL
+      MYSQL_ROOT_PASSWORD: rootpassword   # Пароль для root користувача
+    ports:
+      - "8080:80"                         # Прокидання порту для доступу до phpMyAdmin
+    networks:
+      - mysql_network
+    depends_on:
+      - mysql                              # Залежність від MySQL
+
+volumes:
+  mysql_data:
+
+networks:
+  mysql_network:
+    driver: bridge
